@@ -234,13 +234,11 @@ export default {
       let slots = componentOpts.slots
       if (typeof slots === 'function') slots = slots(props) || false
       if (typeof slots === 'boolean' && slots) {
-        this.nodeInfo.stack = false
         this.$set(this.nodeInfo, 'hasSlot', true)
         return i => ({name: `slot${i}`, style: null})
       }
       if (slots instanceof Array && slots.length > 0) {
         this.nodeInfo.childLimit = slots.length
-        this.nodeInfo.stack = false
         slots = slots.map((v, i) => {
           return {
             name: typeof v === 'string' ? v : (v && v.name || `slot${i}`),
@@ -250,9 +248,9 @@ export default {
         this.$set(this.nodeInfo, 'hasSlot', true)
         return i => slots[i]
       }
-      if (slots && slots.style) {
+      if (slots && typeof slots === 'object' && ('name' in slots || 'style' in slots)) {
         this.$set(this.nodeInfo, 'hasSlot', true)
-        return i => ({name: `slot${i}`, style: slots.style})
+        return i => ({name: slots.name || `slot${i}`, style: slots.style})
       }
       this.$delete(this.nodeInfo, 'hasSlot')
       return false
